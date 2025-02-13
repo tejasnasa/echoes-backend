@@ -5,8 +5,9 @@ import masterRouter from "./routes/masterRouter";
 
 const app = express();
 
-app.use("/api/v1", masterRouter);
 app.use(express.json());
+
+app.use("/api/v1", masterRouter);
 
 export const db = drizzle({
   connection: {

@@ -1,6 +1,4 @@
-import { Response } from "express";
-
-export class CustomResponse<T = null> {
+export class ServerResponse<T = null> {
   success: boolean;
   message: string;
   responseObject: T;
@@ -20,8 +18,4 @@ export class CustomResponse<T = null> {
     this.statusCode = statusCode;
     this.accessToken = accessToken;
   }
-}
-
-export interface ServerResponse extends Response {
-  json: <T>(body: CustomResponse<T>) => this;
 }

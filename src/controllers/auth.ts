@@ -1,26 +1,46 @@
-import { ClientResponse } from "../models/clientResponse";
+import { ServerResponse } from "../models/serverResponse";
 import { user } from "../db/schema";
 import { db } from "../index";
 import { eq } from "drizzle-orm";
+import { hash } from "bcrypt";
 
-export const signup = async (data: typeof user.$inferInsert) => {
-  const existingUsername = db
-    .select()
-    .from(user)
-    .where(eq(user.username, data.username));
-  if (existingUsername) {
-    return new ClientResponse(false, "Username already exists", null, 409);
+export const signup = async ({
+  username,
+  fullname,
+  email,
+  password,
+}: typeof user.$inferInsert) => {
+  try {
+    const existingUsername = db
+      .select()
+      .from(user)
+      .where(eq(user.username, username));
+
+    if ((await existingUsername).length > 0) {
+      return new ServerResponse(false, "Username already exists", null, 409);
+    }
+
+    const existingEmail = db.select().from(user).where(eq(user.email, email));
+    if ((await existingEmail).length > 0) {
+      return new ServerResponse(false, "Email already exists", null, 409);
+    }
+
+    const hashedPassword = await hash(password, 10);
+
+    const newUser = db
+      .insert(user)
+      .values({
+        username,
+        fullname,
+        email,
+        password: hashedPassword,
+      })
+      .returning();
+    console.log(newUser);
+
+    return new ServerResponse(true, "User created", await newUser, 201);
+  } catch (error) {
+    console.log(error);
+    return new ServerResponse(false, "Server error", error, 400);
   }
-
-  const existingEmail = db
-    .select()
-    .from(user)
-    .where(eq(user.email, data.email));
-  if (existingEmail) {
-    return new ClientResponse(false, "Email already exists", null, 409);
-  }
-
-  const newUser = db.insert(user).values(data);
-
-  return new ClientResponse(true, "User created", newUser, 201);
 };
