@@ -3,23 +3,38 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "lint": "eslint src/**/*.ts",
+    "format": "eslint src/**/*.ts --fix"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint"
+    }
   },
   "author": "Tejas Nasa",
   "license": "ISC",
   "description": "",
-  "devDependencies": {
-    "@types/express": "^5.0.0",
-    "@types/pg": "^8.11.11",
-    "drizzle-kit": "^0.30.4",
-    "tsx": "^4.19.2",
-    "typescript": "^5.7.3"
-  },
   "dependencies": {
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.39.1",
     "express": "^4.21.2",
     "pg": "^8.13.1",
     "uuid": "^11.0.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.20.0",
+    "@types/express": "^5.0.0",
+    "@types/pg": "^8.11.11",
+    "@typescript-eslint/eslint-plugin": "^8.24.0",
+    "@typescript-eslint/parser": "^8.24.0",
+    "drizzle-kit": "^0.30.4",
+    "eslint": "^9.20.1",
+    "globals": "^15.15.0",
+    "husky": "^9.1.7",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.24.0"
   }
 }

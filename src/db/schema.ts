@@ -12,7 +12,7 @@ export const user = pgTable("user", {
   created_at: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const post: any = pgTable("post", {
+export const post:any = pgTable("post", {
   id: uuid("id").defaultRandom().notNull().primaryKey().unique(),
   userId: uuid("userid")
     .references(() => user.id, { onDelete: "cascade" })

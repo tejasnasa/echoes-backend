@@ -1,7 +1,6 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import express from "express";
 import "dotenv/config";
-import { user } from "./db/schema";
 const app = express();
 
 export const db = drizzle({
