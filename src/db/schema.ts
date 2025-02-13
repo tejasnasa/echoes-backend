@@ -1,9 +1,11 @@
+/* eslint-disable */
+
 import { pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: uuid("id").defaultRandom().notNull().primaryKey().unique(),
   email: varchar("email", { length: 64 }).notNull().unique(),
-  password: varchar("email", { length: 64 }).notNull(),
+  password: varchar("password", { length: 64 }).notNull(),
   username: varchar("username", { length: 64 }).notNull().unique(),
   fullname: varchar("fullname", { length: 64 }).notNull(),
   profile_pic: text("profile_pic"),
@@ -12,7 +14,7 @@ export const user = pgTable("user", {
   created_at: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const post:any = pgTable("post", {
+export const post: any = pgTable("post", {
   id: uuid("id").defaultRandom().notNull().primaryKey().unique(),
   userId: uuid("userid")
     .references(() => user.id, { onDelete: "cascade" })
