@@ -101,7 +101,7 @@ export const login = async ({
       true,
       "User logged in",
       userCheck[0].id,
-      201,
+      200,
       token
     );
   } catch (error) {
