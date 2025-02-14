@@ -3,6 +3,7 @@ import { user } from "../db/schema";
 import { db } from "../index";
 import { eq } from "drizzle-orm";
 import { hash } from "bcrypt";
+import { createToken } from "../utils/jwtConfig";
 
 export const signup = async ({
   username,
@@ -16,12 +17,14 @@ export const signup = async ({
       .select()
       .from(user)
       .where(eq(user.username, username));
+
     if ((await existingUsername).length > 0) {
       throw new Error("Username already exists");
     }
 
     // Check for existing username
     const existingEmail = db.select().from(user).where(eq(user.email, email));
+
     if ((await existingEmail).length > 0) {
       throw new Error("Email already exists");
     }
@@ -29,7 +32,7 @@ export const signup = async ({
     const hashedPassword = await hash(password, 10); // Password hash
 
     // Inserting values
-    const newUser = db
+    const newUser = await db
       .insert(user)
       .values({
         username,
@@ -39,7 +42,12 @@ export const signup = async ({
       })
       .returning({ id: user.id });
 
-    return new ServerResponse(true, "User created", await newUser, 201); // Returning successful response
+    // JWT token creation
+    const token = createToken({
+      userid: newUser[0].id,
+    });
+
+    return new ServerResponse(true, "User created", newUser[0].id, 201, token); // Returning successful response
   } catch (error) {
     console.log(error);
 
