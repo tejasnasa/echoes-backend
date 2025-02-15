@@ -1,6 +1,13 @@
 /* eslint-disable */
 
-import { pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  serial,
+  text,
+  timestamp,
+  uuid,
+  varchar,
+} from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: uuid("id").defaultRandom().notNull().primaryKey().unique(),
@@ -16,6 +23,7 @@ export const user = pgTable("user", {
 
 export const post: any = pgTable("post", {
   id: uuid("id").defaultRandom().notNull().primaryKey().unique(),
+  serialId: serial("serial_id").notNull().unique(),
   userId: uuid("userid")
     .references(() => user.id, { onDelete: "cascade" })
     .notNull(),

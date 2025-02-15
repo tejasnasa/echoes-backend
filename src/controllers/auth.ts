@@ -46,9 +46,13 @@ export const signup = async ({
       .returning({ id: user.id });
 
     // JWT token creation
-    const token = jwt.sign(newUser[0].id, `${process.env.JWT_SECRET}`, {
-      expiresIn: "1w",
-    });
+    const token = jwt.sign(
+      { userId: newUser[0].id },
+      `${process.env.JWT_SECRET}`,
+      {
+        expiresIn: "1w",
+      }
+    );
 
     return new ServerResponse(true, "User created", newUser[0].id, 201, token); // Returning successful response
   } catch (error) {
@@ -93,9 +97,13 @@ export const login = async ({
     }
 
     // JWT token creation
-    const token = jwt.sign(userCheck[0].id, `${process.env.JWT_SECRET}`, {
-      expiresIn: "1w",
-    });
+    const token = jwt.sign(
+      { userId: userCheck[0].id },
+      `${process.env.JWT_SECRET}`,
+      {
+        expiresIn: "1w",
+      }
+    );
 
     return new ServerResponse( // Returning successful response
       true,
