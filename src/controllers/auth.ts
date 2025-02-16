@@ -71,7 +71,7 @@ export const signup = async ({
 
 export const login = async ({
   emailOrUsername,
-  password, 
+  password,
 }: {
   emailOrUsername: string;
   password: string;

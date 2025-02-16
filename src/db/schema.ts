@@ -11,6 +11,7 @@ import {
 
 export const user = pgTable("user", {
   id: uuid("id").defaultRandom().notNull().primaryKey().unique(),
+  serialId: serial("serial_id").notNull().unique(),
   email: varchar("email", { length: 64 }).notNull().unique(),
   password: varchar("password", { length: 64 }).notNull(),
   username: varchar("username", { length: 64 }).notNull().unique(),
