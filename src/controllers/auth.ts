@@ -12,23 +12,17 @@ export const signup = async ({
   password,
 }: typeof user.$inferInsert) => {
   try {
-    // Check for existing username
-    const existingUsername = await db
-      .select()
-      .from(user)
-      .where(eq(user.username, username));
+    // Check for existing username or email
+    const [existingUsername, existingEmail] = await Promise.all([
+      db.select().from(user).where(eq(user.username, username)),
+      db.select().from(user).where(eq(user.email, email)),
+    ]);
 
-    if (existingUsername.length > 0) {
+    if (existingUsername.length) {
       throw new Error("Username already exists");
     }
 
-    // Check for existing username
-    const existingEmail = await db
-      .select()
-      .from(user)
-      .where(eq(user.email, email));
-
-    if (existingEmail.length > 0) {
+    if (existingEmail.length) {
       throw new Error("Email already exists");
     }
 
@@ -101,7 +95,7 @@ export const login = async ({
       { userId: userCheck[0].id },
       `${process.env.JWT_SECRET}`,
       {
-        expiresIn: "1w",
+        expiresIn: "1m",
       }
     );
 
