@@ -39,7 +39,7 @@ export const likePost = async ({
     // Like post
     await db.insert(like).values({
       postId: postToBeLiked.id,
-      userId: userId,
+      userId,
     });
 
     return new ServerResponse(true, "Post liked", null, 200); // Successful response

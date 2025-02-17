@@ -38,7 +38,7 @@ export const createPost = async (data: {
   postAboveId: string;
 }) => {
   try {
-    const newPost = await db // Post creation
+    const [newPost] = await db // Post creation
       .insert(post)
       .values({ ...data })
       .returning({ serialId: post.serialId });
@@ -46,7 +46,7 @@ export const createPost = async (data: {
     return new ServerResponse(true, "Post created", newPost, 200); // Returning successful response
   } catch (error) {
     console.log(error);
-    return new ServerResponse(false, "Internal server error", error, 400) // Returning unsuccessful response
+    return new ServerResponse(false, "Internal server error", error, 400); // Returning unsuccessful response
   }
 };
 
@@ -59,12 +59,13 @@ export const deletePost = async ({
 }) => {
   try {
     // Checking if the user is authorized the delete the particular post
-    const postCheck = await db 
+    const postCheck = await db
       .select()
       .from(post)
       .where(and(eq(post.serialId, postSerId), eq(post.userId, userId)));
 
-    if (!postCheck.length) { // Throw error if user is unauthorized
+    if (!postCheck.length) {
+      // Throw error if user is unauthorized
       throw new Error("Unauthorized");
     }
 

@@ -13,6 +13,7 @@ export const signup = async ({
 }: typeof user.$inferInsert) => {
   try {
     // Check for existing username or email
+    // Error prone💀
     const [existingUsername, existingEmail] = await Promise.all([
       db.select().from(user).where(eq(user.username, username)),
       db.select().from(user).where(eq(user.email, email)),
@@ -37,7 +38,7 @@ export const signup = async ({
         email,
         password: hashedPassword,
       })
-      .returning({ id: user.id });
+      .returning({ serialId: user.serialId, id: user.id });
 
     // JWT token creation
     const token = jwt.sign(
@@ -48,7 +49,13 @@ export const signup = async ({
       }
     );
 
-    return new ServerResponse(true, "User created", newUser[0].id, 201, token); // Returning successful response
+    return new ServerResponse(
+      true,
+      "User created",
+      newUser[0].serialId,
+      201,
+      token
+    ); // Returning successful response
   } catch (error) {
     console.log(error);
 
