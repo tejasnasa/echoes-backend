@@ -84,3 +84,28 @@ export const deletePost = async ({
     return new ServerResponse(false, "Internal server error", error, 400); // Returning unsuccessful response
   }
 };
+
+export const getPostData = async (postSerId: string) => {
+  try {
+    // Fetching post data
+    const postData = await db
+      .select()
+      .from(post)
+      .where(eq(post.serialId, postSerId))
+      .limit(1);
+
+    if (!postData.length) {
+      throw new Error("Post does not exist");
+    }
+
+    return new ServerResponse(true, "Post data fetched", postData, 200); // Returning successful resposne
+  } catch (error) {
+    console.log(error);
+
+    if (error.message === "Post does not exist") {
+      return new ServerResponse(false, error.message, error, 400); // Returning unsuccessful response
+    }
+
+    return new ServerResponse(false, "Internal server error", error, 400); // Returning unsuccessful response
+  }
+};

@@ -8,7 +8,7 @@ import {
 
 const userRouter = express.Router();
 
-userRouter.get("/user/:userSerId", async (req: Request, res: Response) => {
+userRouter.get("/get/:userSerId", async (req: Request, res: Response) => {
   const { userSerId } = req.params;
 
   const response = await getUserData(userSerId);
@@ -36,9 +36,9 @@ userRouter.get("/search", async (req: Request, res: Response) => {
   res.status(response.statusCode).json(response);
 });
 
-userRouter.get("/recommended", async (req: Request, res: Response) => {
+userRouter.get("/recommended/:limit", async (req: Request, res: Response) => {
   const { userId } = req.body.token;
-  const { limit } = req.body;
+  const { limit } = req.params;
 
   const response = await fetchRecommendedUsers({ userId, limit });
 

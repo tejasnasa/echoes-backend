@@ -1,10 +1,24 @@
 import express, { Request, Response } from "express";
-import { createPost, deletePost, getHomePosts } from "../controllers/post";
+import {
+  createPost,
+  deletePost,
+  getHomePosts,
+  getPostData,
+} from "../controllers/post";
 
 const postRouter = express.Router();
 
 postRouter.get("/", async (req: Request, res: Response) => {
   const response = await getHomePosts();
+
+  res.status(response.statusCode).json(response);
+});
+
+postRouter.get("/get/:postSerId", async (req: Request, res: Response) => {
+  const { postSerId } = req.params;
+
+  const response = await getPostData(postSerId);
+
   res.status(response.statusCode).json(response);
 });
 

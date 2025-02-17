@@ -131,7 +131,7 @@ export const fetchRecommendedUsers = async ({
   limit,
 }: {
   userId: string;
-  limit: number;
+  limit: string;
 }) => {
   try {
     // Fetching users who I don't follow, i.e.
@@ -162,7 +162,7 @@ export const fetchRecommendedUsers = async ({
           not(eq(user.id, userId))
         )
       )
-      .limit(limit);
+      .limit(limit as unknown as number);
 
     return new ServerResponse( // Successful response
       true,
