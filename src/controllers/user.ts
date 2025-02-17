@@ -1,4 +1,4 @@
-import { and, eq, ilike, or } from "drizzle-orm";
+import { and, eq, exists, ilike, not, or } from "drizzle-orm";
 import { follow, post, user } from "../db/schema";
 import { db } from "../index";
 import { ServerResponse } from "../models/serverResponse";
@@ -126,4 +126,53 @@ export const searchUsers = async (query: string) => {
   }
 };
 
-export const getRecommendedUsers = () => {};
+export const fetchRecommendedUsers = async ({
+  userId,
+  limit,
+}: {
+  userId: string;
+  limit: number;
+}) => {
+  try {
+    // Fetching users who I don't follow, i.e.
+    // Getting a list of all users excluding myself and users that I already follow
+    const recommendedUsers = await db
+      .select({
+        serialId: user.serialId,
+        username: user.username,
+        fullname: user.fullname,
+        profile_pic: user.profile_pic,
+      })
+      .from(user)
+      .where(
+        and(
+          not(
+            exists(
+              db
+                .select()
+                .from(follow)
+                .where(
+                  and(
+                    eq(follow.followerId, userId),
+                    eq(follow.followingId, user.id)
+                  )
+                )
+            )
+          ),
+          not(eq(user.id, userId))
+        )
+      )
+      .limit(limit);
+
+    return new ServerResponse( // Successful response
+      true,
+      "Recommended users fetched",
+      recommendedUsers,
+      200
+    );
+  } catch (error) {
+    console.log(error);
+
+    return new ServerResponse(false, "Internal server error", error, 400); // Unsuccessful response
+  }
+};

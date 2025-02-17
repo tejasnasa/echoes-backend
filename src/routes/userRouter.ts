@@ -1,5 +1,10 @@
 import express, { Request, Response } from "express";
-import { followUser, getUserData, searchUsers } from "../controllers/user";
+import {
+  fetchRecommendedUsers,
+  followUser,
+  getUserData,
+  searchUsers,
+} from "../controllers/user";
 
 const userRouter = express.Router();
 
@@ -27,6 +32,15 @@ userRouter.get("/search", async (req: Request, res: Response) => {
   const { query } = req.query;
 
   const response = await searchUsers(query as string);
+
+  res.status(response.statusCode).json(response);
+});
+
+userRouter.get("/recommended", async (req: Request, res: Response) => {
+  const { userId } = req.body.token;
+  const { limit } = req.body;
+
+  const response = await fetchRecommendedUsers({ userId, limit });
 
   res.status(response.statusCode).json(response);
 });
