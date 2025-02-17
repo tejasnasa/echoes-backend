@@ -3,7 +3,7 @@ import { followUser, getUserData, searchUsers } from "../controllers/user";
 
 const userRouter = express.Router();
 
-userRouter.get("/:userSerId", async (req: Request, res: Response) => {
+userRouter.get("/user/:userSerId", async (req: Request, res: Response) => {
   const { userSerId } = req.params;
 
   const response = await getUserData(userSerId);
