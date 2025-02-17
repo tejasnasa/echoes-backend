@@ -1,5 +1,5 @@
-import { and, eq } from "drizzle-orm";
-import { like, post } from "../db/schema";
+import { and, desc, eq } from "drizzle-orm";
+import { like, post, user } from "../db/schema";
 import { db } from "../index";
 import { ServerResponse } from "../models/serverResponse";
 
@@ -50,14 +50,30 @@ export const likePost = async ({
   }
 };
 
-// export const fetchLikedPosts = async (userId: string) => {
-//   try {
-//     const likedPosts = await db.select({
-//       postSerId: post.serialId,
-//       text: post.text,
-//       images: post.images
-//     }).from(post)
-//   } catch (error) {
-    
-//   }
-// }
+export const fetchLikedPosts = async (userId: string) => {
+  try {
+    // Fetch posts having likes by the given user
+    const likedPosts = await db
+      .select({
+        serialId: post.serialId,
+        text: post.text,
+        images: post.images,
+        user: {
+          serialId: user.serialId,
+          username: user.username,
+          profile_pic: user.profile_pic,
+        },
+      })
+      .from(post)
+      .innerJoin(like, eq(post.id, like.postId))
+      .leftJoin(user, eq(post.userId, user.id))
+      .where(eq(like.userId, userId))
+      .orderBy(desc(like.createdAt));
+
+    return new ServerResponse(true, "Liked posts fetched", likedPosts, 200); // Successful response
+  } catch (error) {
+    console.log(error);
+
+    return new ServerResponse(false, "Internal server error", error, 400); // Unsuccessful response
+  }
+};

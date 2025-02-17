@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import { likePost } from "../controllers/like";
+import { fetchLikedPosts, likePost } from "../controllers/like";
 
 const likeRouter = express.Router();
 
@@ -12,12 +12,12 @@ likeRouter.post("/:postSerId", async (req: Request, res: Response) => {
   res.status(response.statusCode).json(response);
 });
 
-// likeRouter.get("/", async (req: Request, res: Response) => {
-//   const { userId } = req.body.token;
+likeRouter.get("/", async (req: Request, res: Response) => {
+  const { userId } = req.body.token;
 
-//   const response = await fetchLikedPosts(userId);
+  const response = await fetchLikedPosts(userId);
 
-//   res.status(response.statusCode).json(response);
-// });
+  res.status(response.statusCode).json(response);
+});
 
 export default likeRouter;
