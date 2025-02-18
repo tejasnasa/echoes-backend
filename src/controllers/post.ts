@@ -89,16 +89,28 @@ export const getPostData = async (postSerId: string) => {
   try {
     // Fetching post data
     const postData = await db
-      .select()
+      .select({
+        serialId: post.serialId,
+        text: post.text,
+        images: post.images,
+        createdAt: post.createdAt,
+        user: {
+          id: user.id,
+          fullname: user.fullname,
+          username: user.username,
+          profile_pic: user.profile_pic,
+        },
+      })
       .from(post)
       .where(eq(post.serialId, postSerId))
+      .leftJoin(user, eq(post.userId, user.id))
       .limit(1);
 
     if (!postData.length) {
       throw new Error("Post does not exist");
     }
 
-    return new ServerResponse(true, "Post data fetched", postData, 200); // Returning successful resposne
+    return new ServerResponse(true, "Post data fetched", postData[0], 200); // Returning successful resposne
   } catch (error) {
     console.log(error);
 
