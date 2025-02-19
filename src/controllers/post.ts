@@ -1,7 +1,7 @@
 import { ServerResponse } from "../models/serverResponse";
 import { post, user } from "../db/schema";
 import { db } from "../index";
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 
 export const getHomePosts = async () => {
   try {
@@ -20,7 +20,8 @@ export const getHomePosts = async () => {
         },
       })
       .from(post)
-      .leftJoin(user, eq(post.userId, user.id));
+      .leftJoin(user, eq(post.userId, user.id))
+      .orderBy(desc(post.createdAt));
 
     return new ServerResponse(true, "Posts fetched", posts, 200); // Returning successful response
   } catch (error) {

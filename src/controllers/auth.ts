@@ -30,7 +30,7 @@ export const signup = async ({
     const hashedPassword = await hash(password, 10); // Password hash
 
     // Inserting values
-    const newUser = await db
+    const [newUser] = await db
       .insert(user)
       .values({
         username,
@@ -38,11 +38,17 @@ export const signup = async ({
         email,
         password: hashedPassword,
       })
-      .returning({ serialId: user.serialId, id: user.id });
+      .returning({
+        serialId: user.serialId,
+        id: user.id,
+        username: user.username,
+        fullname: user.fullname,
+        profile_pic: user.profile_pic,
+      });
 
     // JWT token creation
     const token = jwt.sign(
-      { userId: newUser[0].id },
+      { userId: newUser.id },
       `${process.env.JWT_SECRET}`,
       {
         expiresIn: "1w",
@@ -52,7 +58,7 @@ export const signup = async ({
     return new ServerResponse(
       true,
       "User created",
-      newUser[0].serialId,
+      newUser,
       201,
       token
     ); // Returning successful response
@@ -84,7 +90,8 @@ export const login = async ({
       .from(user)
       .where(
         or(eq(user.username, emailOrUsername), eq(user.email, emailOrUsername))
-      );
+      )
+      .limit(1);
 
     if (!userCheck.length) {
       throw new Error("User doesn't exist");
@@ -102,14 +109,20 @@ export const login = async ({
       { userId: userCheck[0].id },
       `${process.env.JWT_SECRET}`,
       {
-        expiresIn: "1m",
+        expiresIn: "1w",
       }
     );
 
     return new ServerResponse( // Returning successful response
       true,
       "User logged in",
-      userCheck[0].id,
+      {
+        serialId: userCheck[0].serialId,
+        id: userCheck[0].id,
+        username: userCheck[0].username,
+        fullname: userCheck[0].fullname,
+        profile_pic: userCheck[0].profile_pic,
+      },
       200,
       token
     );
