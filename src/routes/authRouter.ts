@@ -8,6 +8,10 @@ authRouter.post("/signup", async (req: Request, res: Response) => {
 
   const response = await signup({ username, fullname, email, password });
 
+  if (!response.success) {
+    res.status(response.statusCode).json(response);
+  }
+  
   res
     .status(response.statusCode)
     .cookie("session", response.accessToken, {
@@ -23,6 +27,10 @@ authRouter.post("/login", async (req: Request, res: Response) => {
   const { emailOrUsername, password } = req.body;
 
   const response = await login({ emailOrUsername, password });
+
+  if (!response.success) {
+    res.status(response.statusCode).json(response);
+  }
 
   res
     .status(response.statusCode)

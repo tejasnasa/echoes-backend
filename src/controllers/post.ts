@@ -13,7 +13,7 @@ export const getHomePosts = async () => {
         images: post.images,
         createdAt: post.createdAt,
         user: {
-          id: user.id,
+          serialId: user.serialId,
           fullname: user.fullname,
           username: user.username,
           profile_pic: user.profile_pic,
