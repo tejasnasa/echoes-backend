@@ -14,6 +14,6 @@ masterRouter.use("/post", authCheck, postRouter);
 masterRouter.use("/user", authCheck, userRouter);
 masterRouter.use("/like", authCheck, likeRouter);
 masterRouter.use("/bookmark", authCheck, bookmarkRouter);
-masterRouter.use("/self", selfRouter);
+masterRouter.use("/self", authCheck, selfRouter);
 
 export default masterRouter;

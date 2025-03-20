@@ -1,9 +1,9 @@
 import { ServerResponse } from "../models/serverResponse";
-import { post, user } from "../db/schema";
+import { bookmark, like, post, repost, user } from "../db/schema";
 import { db } from "../index";
-import { and, desc, eq } from "drizzle-orm";
+import { and, count, desc, eq, sql } from "drizzle-orm";
 
-export const getHomePosts = async () => {
+export const getHomePosts = async (userId: string) => {
   try {
     // Fetching posts
     const posts = await db
@@ -18,9 +18,37 @@ export const getHomePosts = async () => {
           username: user.username,
           profile_pic: user.profile_pic,
         },
+        likeCount: count(like.id),
+        repostCount: count(repost.id),
+        bookmarkCount: count(bookmark.id),
+        likedByUser:
+          sql<boolean>`COALESCE(SUM(CASE WHEN ${like.userId} = ${userId} THEN 1 ELSE 0 END), 0) > 0`.as(
+            "likedByUser"
+          ),
+        repostedByUser:
+          sql<boolean>`COALESCE(SUM(CASE WHEN ${repost.userId} = ${userId} THEN 1 ELSE 0 END), 0) > 0`.as(
+            "repostedByUser"
+          ),
+        bookmarkedByUser:
+          sql<boolean>`COALESCE(SUM(CASE WHEN ${bookmark.userId} = ${userId} THEN 1 ELSE 0 END), 0) > 0`.as(
+            "bookmarkedByUser"
+          ),
       })
       .from(post)
       .leftJoin(user, eq(post.userId, user.id))
+      .leftJoin(like, eq(post.id, like.postId))
+      .leftJoin(repost, eq(post.id, repost.postId))
+      .leftJoin(bookmark, eq(post.id, bookmark.postId))
+      .groupBy(
+        post.serialId,
+        post.text,
+        post.images,
+        post.createdAt,
+        user.serialId,
+        user.fullname,
+        user.username,
+        user.profile_pic
+      )
       .orderBy(desc(post.createdAt));
 
     return new ServerResponse(true, "Posts fetched", posts, 200); // Returning successful response
@@ -86,7 +114,7 @@ export const deletePost = async ({
   }
 };
 
-export const getPostData = async (postSerId: string) => {
+export const getPostData = async (postSerId: string, userId: string) => {
   try {
     // Fetching post data
     const postData = await db
@@ -96,15 +124,43 @@ export const getPostData = async (postSerId: string) => {
         images: post.images,
         createdAt: post.createdAt,
         user: {
-          id: user.id,
+          serialId: user.serialId,
           fullname: user.fullname,
           username: user.username,
           profile_pic: user.profile_pic,
         },
+        likeCount: count(like.id),
+        repostCount: count(repost.id),
+        bookmarkCount: count(bookmark.id),
+        likedByUser:
+          sql<boolean>`COALESCE(SUM(CASE WHEN ${like.userId} = ${userId} THEN 1 ELSE 0 END), 0) > 0`.as(
+            "likedByUser"
+          ),
+        repostedByUser:
+          sql<boolean>`COALESCE(SUM(CASE WHEN ${repost.userId} = ${userId} THEN 1 ELSE 0 END), 0) > 0`.as(
+            "repostedByUser"
+          ),
+        bookmarkedByUser:
+          sql<boolean>`COALESCE(SUM(CASE WHEN ${bookmark.userId} = ${userId} THEN 1 ELSE 0 END), 0) > 0`.as(
+            "bookmarkedByUser"
+          ),
       })
       .from(post)
       .where(eq(post.serialId, postSerId))
       .leftJoin(user, eq(post.userId, user.id))
+      .leftJoin(like, eq(post.id, like.postId))
+      .leftJoin(repost, eq(post.id, repost.postId))
+      .leftJoin(bookmark, eq(post.id, bookmark.postId))
+      .groupBy(
+        post.serialId,
+        post.text,
+        post.images,
+        post.createdAt,
+        user.serialId,
+        user.fullname,
+        user.username,
+        user.profile_pic
+      )
       .limit(1);
 
     if (!postData.length) {

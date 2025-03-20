@@ -5,7 +5,7 @@ import { ServerResponse } from "../models/serverResponse";
 const authCheck = (req: Request, res: Response, next: NextFunction) => {
   const token = req.cookies.session;
   if (!token) {
-    const response = new ServerResponse(true, "No token provided", null, 401);
+    const response = new ServerResponse(false, "No token provided", null, 401);
     res.status(response.statusCode).json(response);
     return;
   }

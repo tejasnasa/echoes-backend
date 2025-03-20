@@ -9,15 +9,17 @@ import {
 const postRouter = express.Router();
 
 postRouter.get("/", async (req: Request, res: Response) => {
-  const response = await getHomePosts();
+  const { userId } = req.body.token;
+  const response = await getHomePosts(userId);
 
   res.status(response.statusCode).json(response);
 });
 
 postRouter.get("/get/:postSerId", async (req: Request, res: Response) => {
+  const { userId } = req.body.token;
   const { postSerId } = req.params;
 
-  const response = await getPostData(postSerId);
+  const response = await getPostData(postSerId, userId);
 
   res.status(response.statusCode).json(response);
 });
