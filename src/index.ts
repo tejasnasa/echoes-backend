@@ -24,7 +24,9 @@ app.use("/api/v1", masterRouter);
 export const db = drizzle({
   connection: {
     connectionString: process.env.DATABASE_URL,
-    ssl: true,
+    ssl: {
+      rejectUnauthorized: false,
+    },
   },
 });
 

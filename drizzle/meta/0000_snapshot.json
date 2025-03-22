@@ -1,5 +1,5 @@
 {
-  "id": "11692a62-de58-4f8c-a314-26387a87746b",
+  "id": "75983db8-47c7-496a-a979-959054c0ffc9",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -264,6 +264,12 @@
         "post_above_id": {
           "name": "post_above_id",
           "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "post_above_ser_id": {
+          "name": "post_above_ser_id",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },

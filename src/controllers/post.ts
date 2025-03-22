@@ -8,10 +8,12 @@ export const getHomePosts = async (userId: string) => {
     // Fetching posts
     const posts = await db
       .select({
+        id: post.id,
         serialId: post.serialId,
         text: post.text,
         images: post.images,
         createdAt: post.createdAt,
+        postAboveId: post.postAboveId,
         user: {
           serialId: user.serialId,
           fullname: user.fullname,
@@ -40,10 +42,12 @@ export const getHomePosts = async (userId: string) => {
       .leftJoin(repost, eq(post.id, repost.postId))
       .leftJoin(bookmark, eq(post.id, bookmark.postId))
       .groupBy(
+        post.id,
         post.serialId,
         post.text,
         post.images,
         post.createdAt,
+        post.postAboveId,
         user.serialId,
         user.fullname,
         user.username,
@@ -119,10 +123,12 @@ export const getPostData = async (postSerId: string, userId: string) => {
     // Fetching post data
     const postData = await db
       .select({
+        id: post.id,
         serialId: post.serialId,
         text: post.text,
         images: post.images,
         createdAt: post.createdAt,
+        postAboveId: post.postAboveId,
         user: {
           serialId: user.serialId,
           fullname: user.fullname,
@@ -152,10 +158,12 @@ export const getPostData = async (postSerId: string, userId: string) => {
       .leftJoin(repost, eq(post.id, repost.postId))
       .leftJoin(bookmark, eq(post.id, bookmark.postId))
       .groupBy(
+        post.id,
         post.serialId,
         post.text,
         post.images,
         post.createdAt,
+        post.postAboveId,
         user.serialId,
         user.fullname,
         user.username,

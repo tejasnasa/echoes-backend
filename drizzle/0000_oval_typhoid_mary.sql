@@ -29,6 +29,7 @@ CREATE TABLE "post" (
 	"text" text,
 	"images" text[],
 	"post_above_id" uuid,
+	"post_above_ser_id" integer,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "post_id_unique" UNIQUE("id"),
 	CONSTRAINT "post_serial_id_unique" UNIQUE("serial_id")

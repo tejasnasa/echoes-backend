@@ -1,4 +1,4 @@
-import { and, eq, exists, ilike, not, or } from "drizzle-orm";
+import { and, eq, exists, not } from "drizzle-orm";
 import { follow, post, user } from "../db/schema";
 import { db } from "../index";
 import { ServerResponse } from "../models/serverResponse";
@@ -91,34 +91,6 @@ export const followUser = async ({
     });
 
     return new ServerResponse(true, "Followed user", null, 200); // Successful response
-  } catch (error) {
-    console.log(error);
-
-    return new ServerResponse(false, "Internal server error", error, 400); // Unsuccessful response
-  }
-};
-
-export const searchUsers = async (query: string) => {
-  try {
-    const searchQuery = query.trim();
-    // Perform search by username and fullname
-    const users = await db
-      .select({
-        serialId: user.serialId,
-        username: user.username,
-        fullname: user.fullname,
-        profile_pic: user.profile_pic,
-      })
-      .from(user)
-      .where(
-        or(
-          ilike(user.username, `%${searchQuery}%`),
-          ilike(user.fullname, `%${searchQuery}%`)
-        )
-      )
-      .limit(5);
-
-    return new ServerResponse(true, "Searched users fetched", users, 200); // Succcessful response
   } catch (error) {
     console.log(error);
 

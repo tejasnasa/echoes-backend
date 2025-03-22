@@ -6,6 +6,7 @@ import userRouter from "./userRouter";
 import likeRouter from "./likeRouter";
 import bookmarkRouter from "./bookmarkRouter";
 import selfRouter from "./selfRouter";
+import searchRouter from "./searchRouter";
 
 const masterRouter = express.Router();
 
@@ -15,5 +16,6 @@ masterRouter.use("/user", authCheck, userRouter);
 masterRouter.use("/like", authCheck, likeRouter);
 masterRouter.use("/bookmark", authCheck, bookmarkRouter);
 masterRouter.use("/self", authCheck, selfRouter);
+masterRouter.use("/search", authCheck, searchRouter);
 
 export default masterRouter;

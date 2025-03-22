@@ -1,6 +1,7 @@
 /* eslint-disable */
 
 import {
+  integer,
   pgTable,
   serial,
   text,
@@ -25,7 +26,7 @@ export const user = pgTable("user", {
 export const post: any = pgTable("post", {
   id: uuid("id").defaultRandom().notNull().primaryKey().unique(),
   serialId: serial("serial_id").notNull().unique(),
-  userId: uuid("userid")
+  userId: uuid("userid") 
     .references(() => user.id, { onDelete: "cascade" })
     .notNull(),
   text: text("text"),
@@ -33,6 +34,7 @@ export const post: any = pgTable("post", {
   postAboveId: uuid("post_above_id").references(() => post.id, {
     onDelete: "cascade",
   }),
+  postAboveSerId: integer("post_above_ser_id"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
