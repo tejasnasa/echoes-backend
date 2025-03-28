@@ -3,9 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "tsc",
-    "build": "prisma generate && tsc",
-    "start": "nodemon dist/index.js",
-    "postinstall": "prisma generate"
+    "build": "tsc",
+    "start": "nodemon dist/index.js"
   },
   "husky": {
     "hooks": {
