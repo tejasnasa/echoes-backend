@@ -1,12 +1,11 @@
 {
   "name": "echoes-server",
   "version": "1.0.0",
-  "main": "index.js",
   "scripts": {
-    "build": "tsc",
-    "dev": "nodemon src/index.ts",
-    "lint": "eslint src/**/*.ts",
-    "format": "eslint src/**/*.ts --fix"
+    "dev": "tsc",
+    "build": "prisma generate && tsc",
+    "start": "nodemon dist/index.js",
+    "postinstall": "prisma generate"
   },
   "husky": {
     "hooks": {

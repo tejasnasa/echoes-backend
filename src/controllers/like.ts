@@ -58,6 +58,7 @@ export const fetchLikedPosts = async (userId: string) => {
         serialId: post.serialId,
         text: post.text,
         images: post.images,
+        postAboveId: post.postAboveId,
         user: {
           serialId: user.serialId,
           username: user.username,
