@@ -2,9 +2,10 @@
   "name": "echoes-server",
   "version": "1.0.0",
   "scripts": {
-    "dev": "tsc",
+    "dev": "nodemon dist/index.js",
     "build": "tsc",
-    "start": "nodemon dist/index.js"
+    "lint": "eslint src/**/*.ts",
+    "format": "eslint src/**/*.ts --fix"
   },
   "husky": {
     "hooks": {
@@ -19,7 +20,7 @@
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
-    "drizzle-orm": "^0.39.1",
+    "drizzle-orm": "^0.41.0",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
