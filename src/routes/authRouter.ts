@@ -11,14 +11,14 @@ authRouter.post("/signup", async (req: Request, res: Response) => {
   if (!response.success) {
     res.status(response.statusCode).json(response);
   }
-  
+
   res
     .status(response.statusCode)
     .cookie("session", response.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      sameSite: "lax",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     })
     .json(response);
 });
