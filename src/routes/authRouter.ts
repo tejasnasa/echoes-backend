@@ -43,4 +43,20 @@ authRouter.post("/login", async (req: Request, res: Response) => {
     .json(response);
 });
 
+authRouter.post("/logout", async (req: Request, res: Response) => {
+  // res.clearCookie("session", {
+  //   httpOnly: true,
+  //   secure: true,
+  //   sameSite: true,
+  // });
+  res
+    .status(200)
+    .clearCookie("session", {
+      httpOnly: true,
+      secure: true,
+      sameSite: true,
+    })
+    .json({ success: true, message: "Logged out successfully" });
+});
+
 export default authRouter;

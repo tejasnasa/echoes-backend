@@ -5,6 +5,7 @@ import { ServerResponse } from "../models/serverResponse";
 const authCheck = (req: Request, res: Response, next: NextFunction) => {
   const token = req.cookies.session;
   if (!token) {
+    // No token provided (logged out)
     const response = new ServerResponse(false, "No token provided", null, 401);
     res.status(response.statusCode).json(response);
     return;
@@ -17,7 +18,17 @@ const authCheck = (req: Request, res: Response, next: NextFunction) => {
     };
 
     if (Math.floor(Date.now() / 1000) > decoded.exp) {
-      throw new Error("Token expired, login again");
+      // Clear the cookie if expired
+      res.clearCookie("session", {
+        httpOnly: true,
+        secure: true,
+        sameSite: true,
+      });
+      return res
+        .status(403)
+        .json(
+          new ServerResponse(false, "Token expired, login again", null, 403)
+        );
     }
 
     req.body.token = decoded;
@@ -25,12 +36,6 @@ const authCheck = (req: Request, res: Response, next: NextFunction) => {
 
     next();
   } catch (error) {
-    if (error.message === "Token expired, login again") {
-      const response = new ServerResponse(false, error.message, null, 403);
-
-      res.status(response.statusCode).json(response);
-    }
-
     const response = new ServerResponse(false, "Invalid token", error, 401);
     res.status(response.statusCode).json(response);
   }
