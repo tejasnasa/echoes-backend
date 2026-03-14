@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import { user } from "../db/schema";
 import { db } from "../index";
 import { ServerResponse } from "../models/serverResponse";
+import { compare, hash } from "bcrypt";
 
 export const editPassword = async (userId: string, newPassword: string) => {
   try {
@@ -10,13 +11,17 @@ export const editPassword = async (userId: string, newPassword: string) => {
       .from(user)
       .where(eq(user.id, userId));
 
-    if (password === newPassword) {
+    const isPasswordSame = await compare(newPassword, password);
+
+    if (isPasswordSame) {
       throw new Error("Password is the same");
     }
 
+    const hashedPassword = await hash(newPassword, 10);
+
     await db
       .update(user)
-      .set({ password: newPassword })
+      .set({ password: hashedPassword })
       .where(eq(user.id, userId));
 
     return new ServerResponse(true, "Password changed", null, 200);
@@ -31,7 +36,7 @@ export const editPassword = async (userId: string, newPassword: string) => {
 
 export const editProfile = async (
   data: { bio?: string; profile_pic?: string; cover_pic?: string },
-  userId: string
+  userId: string,
 ) => {
   try {
     if (data.bio !== undefined) {

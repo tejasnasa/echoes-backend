@@ -1,6 +1,6 @@
-/* eslint-disable */
-
 import {
+  AnyPgColumn,
+  AnyPgTable,
   integer,
   pgTable,
   serial,
@@ -23,15 +23,15 @@ export const user = pgTable("user", {
   created_at: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const post: any = pgTable("post", {
+export const post = pgTable("post", {
   id: uuid("id").defaultRandom().notNull().primaryKey().unique(),
   serialId: serial("serial_id").notNull().unique(),
-  userId: uuid("userid") 
+  userId: uuid("userid")
     .references(() => user.id, { onDelete: "cascade" })
     .notNull(),
   text: text("text"),
   images: text("images").array(),
-  postAboveId: uuid("post_above_id").references(() => post.id, {
+  postAboveId: uuid("post_above_id").references((): AnyPgColumn => post.id, {
     onDelete: "cascade",
   }),
   postAboveSerId: integer("post_above_ser_id"),

@@ -10,7 +10,7 @@ export const getUserData = async (userSerId: string) => {
       .select({
         serialId: user.serialId,
         username: user.username,
-        fullname: user.username,
+        fullname: user.fullname,
         profile_pic: user.profile_pic,
         bio: user.bio,
         cover_pic: user.cover_pic,
@@ -65,8 +65,8 @@ export const followUser = async ({
       .where(
         and(
           eq(follow.followerId, followerId),
-          eq(follow.followingId, toBeFollowedUser.id)
-        )
+          eq(follow.followingId, toBeFollowedUser.id),
+        ),
       )
       .limit(1);
 
@@ -77,8 +77,8 @@ export const followUser = async ({
         .where(
           and(
             eq(follow.followerId, followerId),
-            eq(follow.followingId, toBeFollowedUser.id)
-          )
+            eq(follow.followingId, toBeFollowedUser.id),
+          ),
         );
 
       return new ServerResponse(true, "Unfollowed user", null, 200); // Successful response
@@ -126,13 +126,13 @@ export const fetchRecommendedUsers = async ({
                 .where(
                   and(
                     eq(follow.followerId, userId),
-                    eq(follow.followingId, user.id)
-                  )
-                )
-            )
+                    eq(follow.followingId, user.id),
+                  ),
+                ),
+            ),
           ),
-          not(eq(user.id, userId))
-        )
+          not(eq(user.id, userId)),
+        ),
       )
       .limit(limit as unknown as number);
 
@@ -140,7 +140,7 @@ export const fetchRecommendedUsers = async ({
       true,
       "Recommended users fetched",
       recommendedUsers,
-      200
+      200,
     );
   } catch (error) {
     console.log(error);

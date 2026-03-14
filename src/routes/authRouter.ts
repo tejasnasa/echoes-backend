@@ -10,6 +10,7 @@ authRouter.post("/signup", async (req: Request, res: Response) => {
 
   if (!response.success) {
     res.status(response.statusCode).json(response);
+    return;
   }
 
   res
@@ -21,6 +22,7 @@ authRouter.post("/signup", async (req: Request, res: Response) => {
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     })
     .json(response);
+  return;
 });
 
 authRouter.post("/login", async (req: Request, res: Response) => {
@@ -30,6 +32,7 @@ authRouter.post("/login", async (req: Request, res: Response) => {
 
   if (!response.success) {
     res.status(response.statusCode).json(response);
+    return;
   }
 
   res
@@ -41,6 +44,7 @@ authRouter.post("/login", async (req: Request, res: Response) => {
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     })
     .json(response);
+  return;
 });
 
 authRouter.post("/logout", async (req: Request, res: Response) => {

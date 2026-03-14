@@ -24,11 +24,14 @@ const authCheck = (req: Request, res: Response, next: NextFunction) => {
         secure: true,
         sameSite: true,
       });
-      return res
+
+      res
         .status(403)
         .json(
-          new ServerResponse(false, "Token expired, login again", null, 403)
+          new ServerResponse(false, "Token expired, login again", null, 403),
         );
+
+      return;
     }
 
     req.body.token = decoded;

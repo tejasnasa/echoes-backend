@@ -17,7 +17,7 @@ export const likePost = async ({
         id: post.id,
       })
       .from(post)
-      .where(eq(post.serialId, postSerId))
+      .where(eq(post.serialId, Number(postSerId)))
       .limit(1);
 
     // Checking if the like already exists

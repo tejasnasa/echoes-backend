@@ -25,15 +25,15 @@ export const getHomePosts = async (userId: string) => {
         bookmarkCount: count(bookmark.id),
         likedByUser:
           sql<boolean>`COALESCE(SUM(CASE WHEN ${like.userId} = ${userId} THEN 1 ELSE 0 END), 0) > 0`.as(
-            "likedByUser"
+            "likedByUser",
           ),
         repostedByUser:
           sql<boolean>`COALESCE(SUM(CASE WHEN ${repost.userId} = ${userId} THEN 1 ELSE 0 END), 0) > 0`.as(
-            "repostedByUser"
+            "repostedByUser",
           ),
         bookmarkedByUser:
           sql<boolean>`COALESCE(SUM(CASE WHEN ${bookmark.userId} = ${userId} THEN 1 ELSE 0 END), 0) > 0`.as(
-            "bookmarkedByUser"
+            "bookmarkedByUser",
           ),
       })
       .from(post)
@@ -51,7 +51,7 @@ export const getHomePosts = async (userId: string) => {
         user.serialId,
         user.fullname,
         user.username,
-        user.profile_pic
+        user.profile_pic,
       )
       .orderBy(desc(post.createdAt));
 
@@ -92,10 +92,12 @@ export const deletePost = async ({
 }) => {
   try {
     // Checking if the user is authorized the delete the particular post
+    const postSerIdNumber = Number(postSerId);
+
     const postCheck = await db
       .select()
       .from(post)
-      .where(and(eq(post.serialId, postSerId), eq(post.userId, userId)));
+      .where(and(eq(post.serialId, postSerIdNumber), eq(post.userId, userId)));
 
     if (!postCheck.length) {
       // Throw error if user is unauthorized
@@ -104,7 +106,7 @@ export const deletePost = async ({
 
     const deletedPost = await db // Deleting post
       .delete(post)
-      .where(eq(post.serialId, postSerId));
+      .where(eq(post.serialId, postSerIdNumber));
 
     return new ServerResponse(true, "Post deleted", deletedPost, 200); // Returning successful response
   } catch (error) {
@@ -140,19 +142,19 @@ export const getPostData = async (postSerId: string, userId: string) => {
         bookmarkCount: count(bookmark.id),
         likedByUser:
           sql<boolean>`COALESCE(SUM(CASE WHEN ${like.userId} = ${userId} THEN 1 ELSE 0 END), 0) > 0`.as(
-            "likedByUser"
+            "likedByUser",
           ),
         repostedByUser:
           sql<boolean>`COALESCE(SUM(CASE WHEN ${repost.userId} = ${userId} THEN 1 ELSE 0 END), 0) > 0`.as(
-            "repostedByUser"
+            "repostedByUser",
           ),
         bookmarkedByUser:
           sql<boolean>`COALESCE(SUM(CASE WHEN ${bookmark.userId} = ${userId} THEN 1 ELSE 0 END), 0) > 0`.as(
-            "bookmarkedByUser"
+            "bookmarkedByUser",
           ),
       })
       .from(post)
-      .where(eq(post.serialId, postSerId))
+      .where(eq(post.serialId, Number(postSerId)))
       .leftJoin(user, eq(post.userId, user.id))
       .leftJoin(like, eq(post.id, like.postId))
       .leftJoin(repost, eq(post.id, repost.postId))
@@ -167,7 +169,7 @@ export const getPostData = async (postSerId: string, userId: string) => {
         user.serialId,
         user.fullname,
         user.username,
-        user.profile_pic
+        user.profile_pic,
       )
       .limit(1);
 
