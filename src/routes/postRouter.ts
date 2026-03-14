@@ -5,6 +5,8 @@ import {
   getHomePosts,
   getPostData,
 } from "../controllers/post";
+import validate from "../middlewares/validate";
+import { postSchema } from "../models/validations";
 
 const postRouter = express.Router();
 
@@ -24,14 +26,18 @@ postRouter.get("/get/:postSerId", async (req: Request, res: Response) => {
   res.status(response.statusCode).json(response);
 });
 
-postRouter.post("/create", async (req: Request, res: Response) => {
-  const { userId } = req.body.token;
-  const { text, images, postAboveId } = req.body;
+postRouter.post(
+  "/create",
+  validate(postSchema),
+  async (req: Request, res: Response) => {
+    const { userId } = req.body.token;
+    const { text, images, postAboveId } = req.body;
 
-  const response = await createPost({ userId, text, images, postAboveId });
+    const response = await createPost({ userId, text, images, postAboveId });
 
-  res.status(response.statusCode).json(response);
-});
+    res.status(response.statusCode).json(response);
+  },
+);
 
 postRouter.delete("/delete/:postSerId", async (req: Request, res: Response) => {
   const { userId } = req.body.token;
