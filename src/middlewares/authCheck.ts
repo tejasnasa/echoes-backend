@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { ServerResponse } from "../models/serverResponse";
+import { env } from "../config/env";
 
 const authCheck = (req: Request, res: Response, next: NextFunction) => {
   const token = req.cookies.session;
@@ -12,7 +13,7 @@ const authCheck = (req: Request, res: Response, next: NextFunction) => {
   }
 
   try {
-    const decoded = jwt.verify(token, `${process.env.JWT_SECRET}`) as {
+    const decoded = jwt.verify(token, `${env.JWT_SECRET}`) as {
       userId: string;
       exp: number;
     };

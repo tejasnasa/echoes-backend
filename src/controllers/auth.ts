@@ -4,6 +4,7 @@ import { db } from "../index";
 import { eq, or } from "drizzle-orm";
 import { compare, hash } from "bcrypt";
 import jwt from "jsonwebtoken";
+import { env } from "../config/env";
 
 export const signup = async ({
   username,
@@ -47,21 +48,11 @@ export const signup = async ({
       });
 
     // JWT token creation
-    const token = jwt.sign(
-      { userId: newUser.id },
-      `${process.env.JWT_SECRET}`,
-      {
-        expiresIn: "1w",
-      }
-    );
+    const token = jwt.sign({ userId: newUser.id }, `${env.JWT_SECRET}`, {
+      expiresIn: "1w",
+    });
 
-    return new ServerResponse(
-      true,
-      "User created",
-      newUser,
-      201,
-      token
-    ); // Returning successful response
+    return new ServerResponse(true, "User created", newUser, 201, token); // Returning successful response
   } catch (error) {
     console.log(error);
 
@@ -89,7 +80,7 @@ export const login = async ({
       .select()
       .from(user)
       .where(
-        or(eq(user.username, emailOrUsername), eq(user.email, emailOrUsername))
+        or(eq(user.username, emailOrUsername), eq(user.email, emailOrUsername)),
       )
       .limit(1);
 
@@ -105,13 +96,9 @@ export const login = async ({
     }
 
     // JWT token creation
-    const token = jwt.sign(
-      { userId: userCheck[0].id },
-      `${process.env.JWT_SECRET}`,
-      {
-        expiresIn: "1w",
-      }
-    );
+    const token = jwt.sign({ userId: userCheck[0].id }, `${env.JWT_SECRET}`, {
+      expiresIn: "1w",
+    });
 
     return new ServerResponse( // Returning successful response
       true,
@@ -124,7 +111,7 @@ export const login = async ({
         profile_pic: userCheck[0].profile_pic,
       },
       200,
-      token
+      token,
     );
   } catch (error) {
     console.log(error);

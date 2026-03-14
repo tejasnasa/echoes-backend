@@ -1,6 +1,5 @@
 import {
   AnyPgColumn,
-  AnyPgTable,
   integer,
   pgTable,
   serial,
