@@ -52,7 +52,7 @@ export const editProfile = async (
 
     return new ServerResponse(true, "Profile updated", null, 200);
   } catch (error) {
-    return new ServerResponse(false, "Internal server error", null, 500);
+    return new ServerResponse(false, "Internal server error", error, 500);
   }
 };
 
