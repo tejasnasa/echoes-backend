@@ -39,33 +39,20 @@ export const editProfile = async (
   userId: string,
 ) => {
   try {
-    if (data.bio !== undefined) {
-      await db
-        .update(user)
-        .set({ bio: data.bio } as unknown)
-        .where(eq(user.id, userId));
+    const updates: Partial<typeof user.$inferSelect> = {};
+    if (data.bio !== undefined) updates.bio = data.bio;
+    if (data.profile_pic !== undefined) updates.profile_pic = data.profile_pic;
+    if (data.cover_pic !== undefined) updates.cover_pic = data.cover_pic;
+
+    if (!Object.keys(updates).length) {
+      return new ServerResponse(false, "No fields to update", null, 400);
     }
 
-    if (data.profile_pic !== undefined) {
-      await db
-        .update(user)
-        .set({ profile_pic: data.profile_pic } as unknown)
-        .where(eq(user.id, userId));
-    }
+    await db.update(user).set(updates).where(eq(user.id, userId));
 
-    if (data.cover_pic !== undefined) {
-      await db
-        .update(user)
-        .set({ cover_pic: data.cover_pic } as unknown)
-        .where(eq(user.id, userId));
-    }
-    return new ServerResponse(true, "Data updated", null, 200);
+    return new ServerResponse(true, "Profile updated", null, 200);
   } catch (error) {
-    if (error.message === "Password is the same") {
-      return new ServerResponse(false, error.message, error, 403);
-    }
-
-    return new ServerResponse(false, "Internal server error", error, 400);
+    return new ServerResponse(false, "Internal server error", null, 500);
   }
 };
 
