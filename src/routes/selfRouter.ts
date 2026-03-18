@@ -11,16 +11,21 @@ selfRouter.get("/whoami", async (req: Request, res: Response) => {
   res.status(response.statusCode).json(response);
 });
 
-selfRouter.patch("/password", async (req: Request, res: Response) => {
+selfRouter.put("/password", async (req: Request, res: Response) => {
   const { userId } = req.body.token;
-  const { newPassword } = req.body;
+  const { oldPassword, newPassword1, newPassword2 } = req.body;
 
-  const response = await editPassword(userId, newPassword);
+  const response = await editPassword(
+    userId,
+    oldPassword,
+    newPassword1,
+    newPassword2
+  );
 
   res.status(response.statusCode).json(response);
 });
 
-selfRouter.patch("/edit", async (req: Request, res: Response) => {
+selfRouter.put("/edit", async (req: Request, res: Response) => {
   const { userId } = req.body.token;
   const data = req.body;
 

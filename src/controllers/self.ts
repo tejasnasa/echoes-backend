@@ -4,20 +4,34 @@ import { db } from "../index";
 import { ServerResponse } from "../models/serverResponse";
 import { compare, hash } from "bcrypt";
 
-export const editPassword = async (userId: string, newPassword: string) => {
+export const editPassword = async (
+  userId: string,
+  oldPassword: string,
+  newPassword1: string,
+  newPassword2: string
+) => {
   try {
     const [{ password }] = await db
       .select({ password: user.password })
       .from(user)
       .where(eq(user.id, userId));
 
-    const isPasswordSame = await compare(newPassword, password);
+    const isOldPasswordCorrect = await compare(oldPassword, password);
+    if (!isOldPasswordCorrect) {
+      throw new Error("Old password is incorrect");
+    }
 
-    if (isPasswordSame) {
+    const areNewPasswordsSame = newPassword1 == newPassword2;
+    if (!areNewPasswordsSame) {
+      throw new Error("New passwords do not match");
+    }
+
+    const areOldAndNewPasswordsSame = await compare(newPassword1, password);
+    if (areOldAndNewPasswordsSame) {
       throw new Error("Password is the same");
     }
 
-    const hashedPassword = await hash(newPassword, 10);
+    const hashedPassword = await hash(newPassword1, 10);
 
     await db
       .update(user)
@@ -26,17 +40,22 @@ export const editPassword = async (userId: string, newPassword: string) => {
 
     return new ServerResponse(true, "Password changed", null, 200);
   } catch (error) {
+    if (error.message === "Old password is incorrect") {
+      return new ServerResponse(false, error.message, error, 403);
+    }
+    if (error.message === "New passwords do not match") {
+      return new ServerResponse(false, error.message, error, 403);
+    }
     if (error.message === "Password is the same") {
       return new ServerResponse(false, error.message, error, 403);
     }
-
     return new ServerResponse(false, "Internal server error", error, 400);
   }
 };
 
 export const editProfile = async (
   data: { bio?: string; profile_pic?: string; cover_pic?: string },
-  userId: string,
+  userId: string
 ) => {
   try {
     const updates: Partial<typeof user.$inferSelect> = {};
