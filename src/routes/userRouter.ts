@@ -9,8 +9,9 @@ const userRouter = express.Router();
 
 userRouter.get("/get/:userSerId", async (req: Request, res: Response) => {
   const { userSerId } = req.params;
+  const { userId } = req.body.token;
 
-  const response = await getUserData(userSerId);
+  const response = await getUserData(userSerId, userId);
 
   res.status(response.statusCode).json(response);
 });
@@ -26,8 +27,6 @@ userRouter.post("/follow/:userSerId", async (req: Request, res: Response) => {
 
   res.status(response.statusCode).json(response);
 });
-
-
 
 userRouter.get("/recommended/:limit", async (req: Request, res: Response) => {
   const { userId } = req.body.token;

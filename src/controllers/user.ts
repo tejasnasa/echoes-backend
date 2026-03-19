@@ -1,35 +1,59 @@
-import { and, eq, exists, not } from "drizzle-orm";
+import { and, eq, exists, not, sql } from "drizzle-orm";
 import { follow, post, user } from "../db/schema";
 import { db } from "../index";
 import { ServerResponse } from "../models/serverResponse";
 
-export const getUserData = async (userSerId: string) => {
+export const getUserData = async (userSerId: string, userId: string) => {
   try {
     // Fetch user data
     const userData = await db
       .select({
+        id: user.id,
         serialId: user.serialId,
         username: user.username,
         fullname: user.fullname,
         profile_pic: user.profile_pic,
         bio: user.bio,
         cover_pic: user.cover_pic,
-        post: {
-          serialId: post.serialId,
-          text: post.text,
-          images: post.images,
-        },
+        postsCount: sql<number>`(SELECT COUNT(*)::integer FROM "post" WHERE "post"."userid" = "user"."id")`, // ✅ hardcoded identifiers
+        followersCount: sql<number>`(SELECT COUNT(*)::integer FROM "follows" WHERE "follows"."followingid" = "user"."id")`, // ✅ hardcoded identifiers
       })
       .from(user)
-      .where(eq(user.serialId, Number(userSerId)))
-      .leftJoin(post, eq(post.userId, user.id));
+      .where(eq(user.serialId, Number(userSerId)));
 
     // Error case for user not existing
     if (!userData.length) {
       throw new Error("User doesn't exist");
     }
 
-    return new ServerResponse(true, "User data fetched", userData[0], 200); // Successful response
+    const { id, ...rest } = userData[0];
+
+    const isMe = id === userId;
+
+    let isFollowing = false;
+
+    if (!isMe) {
+      const followData = await db
+        .select()
+        .from(follow)
+        .where(and(eq(follow.followerId, userId), eq(follow.followingId, id)))
+        .limit(1);
+
+      isFollowing = !!followData.length;
+    }
+
+    console.log({ ...rest, isMe, isFollowing });
+
+    return new ServerResponse(
+      true,
+      "User data fetched",
+      {
+        ...rest,
+        isMe,
+        isFollowing,
+      },
+      200
+    ); // Successful response
   } catch (error) {
     console.log(error);
 
@@ -65,8 +89,8 @@ export const followUser = async ({
       .where(
         and(
           eq(follow.followerId, followerId),
-          eq(follow.followingId, toBeFollowedUser.id),
-        ),
+          eq(follow.followingId, toBeFollowedUser.id)
+        )
       )
       .limit(1);
 
@@ -77,11 +101,16 @@ export const followUser = async ({
         .where(
           and(
             eq(follow.followerId, followerId),
-            eq(follow.followingId, toBeFollowedUser.id),
-          ),
+            eq(follow.followingId, toBeFollowedUser.id)
+          )
         );
 
-      return new ServerResponse(true, "Unfollowed user", null, 200); // Successful response
+      return new ServerResponse(
+        true,
+        "Unfollowed user",
+        { following: false },
+        200
+      ); // Successful response
     }
 
     // If follow doesn't exist, follow user
@@ -90,7 +119,14 @@ export const followUser = async ({
       followingId: toBeFollowedUser.id,
     });
 
-    return new ServerResponse(true, "Followed user", null, 200); // Successful response
+    return new ServerResponse(
+      true,
+      "Followed user",
+      {
+        following: true,
+      },
+      200
+    ); // Successful response
   } catch (error) {
     console.log(error);
 
@@ -126,13 +162,13 @@ export const fetchRecommendedUsers = async ({
                 .where(
                   and(
                     eq(follow.followerId, userId),
-                    eq(follow.followingId, user.id),
-                  ),
-                ),
-            ),
+                    eq(follow.followingId, user.id)
+                  )
+                )
+            )
           ),
-          not(eq(user.id, userId)),
-        ),
+          not(eq(user.id, userId))
+        )
       )
       .limit(limit as unknown as number);
 
@@ -140,7 +176,7 @@ export const fetchRecommendedUsers = async ({
       true,
       "Recommended users fetched",
       recommendedUsers,
-      200,
+      200
     );
   } catch (error) {
     console.log(error);
