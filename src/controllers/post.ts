@@ -23,17 +23,22 @@ export const getHomePosts = async (userId: string) => {
         likeCount: count(like.id),
         repostCount: count(repost.id),
         bookmarkCount: count(bookmark.id),
+        replyCount: sql<number>`(
+          SELECT COUNT(*)::integer
+          FROM "post" AS "reply"
+          WHERE "reply"."post_above_id" = ${post.id}
+        )`,
         likedByUser:
           sql<boolean>`COALESCE(SUM(CASE WHEN ${like.userId} = ${userId} THEN 1 ELSE 0 END), 0) > 0`.as(
-            "likedByUser",
+            "likedByUser"
           ),
         repostedByUser:
           sql<boolean>`COALESCE(SUM(CASE WHEN ${repost.userId} = ${userId} THEN 1 ELSE 0 END), 0) > 0`.as(
-            "repostedByUser",
+            "repostedByUser"
           ),
         bookmarkedByUser:
           sql<boolean>`COALESCE(SUM(CASE WHEN ${bookmark.userId} = ${userId} THEN 1 ELSE 0 END), 0) > 0`.as(
-            "bookmarkedByUser",
+            "bookmarkedByUser"
           ),
       })
       .from(post)
@@ -51,7 +56,7 @@ export const getHomePosts = async (userId: string) => {
         user.serialId,
         user.fullname,
         user.username,
-        user.profile_pic,
+        user.profile_pic
       )
       .orderBy(desc(post.createdAt));
 
@@ -142,16 +147,21 @@ export const getPostData = async (postSerId: string, userId: string) => {
         bookmarkCount: count(bookmark.id),
         likedByUser:
           sql<boolean>`COALESCE(SUM(CASE WHEN ${like.userId} = ${userId} THEN 1 ELSE 0 END), 0) > 0`.as(
-            "likedByUser",
+            "likedByUser"
           ),
         repostedByUser:
           sql<boolean>`COALESCE(SUM(CASE WHEN ${repost.userId} = ${userId} THEN 1 ELSE 0 END), 0) > 0`.as(
-            "repostedByUser",
+            "repostedByUser"
           ),
         bookmarkedByUser:
           sql<boolean>`COALESCE(SUM(CASE WHEN ${bookmark.userId} = ${userId} THEN 1 ELSE 0 END), 0) > 0`.as(
-            "bookmarkedByUser",
+            "bookmarkedByUser"
           ),
+        replyCount: sql<number>`(
+            SELECT COUNT(*)::integer
+            FROM "post" AS "reply"
+            WHERE "reply"."post_above_id" = ${post.id}
+          )`,
       })
       .from(post)
       .where(eq(post.serialId, Number(postSerId)))
@@ -169,7 +179,7 @@ export const getPostData = async (postSerId: string, userId: string) => {
         user.serialId,
         user.fullname,
         user.username,
-        user.profile_pic,
+        user.profile_pic
       )
       .limit(1);
 
